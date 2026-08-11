@@ -7,7 +7,7 @@ Welcome to my 20-day machine learning and AI core engineering log.
 ## 🚀 Featured Project: RAG Prompt Guardrail System (Day 10)
 An end-to-end security pipeline that performs custom feature engineering on text queries to block malicious prompt injections using a Random Forest Ensemble model.
 
-*   **💻 Live Interactive App:** [Click Here to View Live Portal]((https://sveltetech-ai-internship-tpantcjetae6kupkfu6llh.streamlit.app/))
+*   **💻 Live Interactive App:** ((https://sveltetech-ai-internship-tpantcjetae6kupkfu6llh.streamlit.app/))
 
 ### 📺 System Execution Demo:
 ![RAG Guardrail App Demo](./Video_Project.gif)
