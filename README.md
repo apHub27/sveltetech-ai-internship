@@ -8,10 +8,9 @@ Welcome to my 20-day machine learning and AI core engineering log.
 An end-to-end security pipeline that performs custom feature engineering on text queries to block malicious prompt injections using a Random Forest Ensemble model.
 
 *   **💻 Live Interactive App:** [Click Here to View Live Portal]((https://sveltetech-ai-internship-tpantcjetae6kupkfu6llh.streamlit.app/))
-*   **📁 Code Notebook:** [09_text_classification_project.ipynb](./09_text_classification_project.ipynb)
 
 ### 📺 System Execution Demo:
-![RAG Guardrail App Demo](./Video Project.gif)
+![RAG Guardrail App Demo](./Video_Project.gif)
 
 ---
 
