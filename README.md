@@ -14,6 +14,9 @@ An end-to-end security pipeline that performs custom feature engineering on text
 
 ---
 
+House price predictor with Random Forest and location dropdown UI
+deployed: https://8501-m-s-kkb-use1c1-18megw66scakm-c.us-east1-1.prod.colab.dev/
+
 ## 📈 Ongoing Curriculum Progress Track
 *   **Day 1-2:** Probability & Descriptive Statistics Baseline
 *   **Day 3-5:** Feature Engineering, Imputation, & Train-Test Splitting
