@@ -7,6 +7,7 @@ from PIL import Image
 st.title("Fashion CNN Classifier")
 st.write("Upload a clothing item image to classify.")
 
+# यह आपके कोलाब का ओरिजिनल आर्किटेक्चर है
 class FashionCNN(nn.Module):
     def __init__(self):
         super(FashionCNN, self).__init__()
@@ -26,7 +27,7 @@ class FashionCNN(nn.Module):
 @st.cache_resource
 def load_model():
     model = FashionCNN()
-    model.load_state_dict(torch.load('fashion_cnn.pth', map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load('my_cnn_model.pth', map_location=torch.device('cpu')))
     model.eval()
     return model
 
@@ -35,24 +36,15 @@ try:
 except Exception as e:
     st.error(f"Error loading model: {e}")
 
-labels = {
-    0: "T-shirt/top",
-    1: "Trouser",
-    2: "Pullover",
-    3: "Dress",
-    4: "Coat",
-    5: "Sandal",
-    6: "Shirt",
-    7: "Sneaker",
-    8: "Bag",
-    9: "Ankle boot"
+clothing_categories = {
+    0: "T-shirt 👕", 1: "Trouser 👖", 2: "Pullover 🧥", 3: "Dress 👗", 4: "Coat 🧥",
+    5: "Sandal 👡", 6: "Shirt 👔", 7: "Sneaker 👟", 8: "Bag 👜", 9: "Ankle boot 🥾"
 }
 
 transform = transforms.Compose([
     transforms.Grayscale(num_output_channels=1),
     transforms.Resize((28, 28)),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))
+    transforms.ToTensor()
 ])
 
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
@@ -65,7 +57,6 @@ if uploaded_file is not None:
     
     with torch.no_grad():
         output = model(input_tensor)
-        _, predicted_class = torch.max(output, 1)
-        class_idx = predicted_class.item()
+        predicted_label_index = torch.argmax(output).item()
         
-    st.success(f"Prediction: {labels[class_idx]}")
+    st.success(f"🎉 Model's Predicted Guess: {clothing_categories[predicted_label_index]}")
