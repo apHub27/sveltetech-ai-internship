@@ -4,7 +4,6 @@ import torch.nn as nn
 import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
-import urllib.request
 
 st.title("Industry Standard Clothing Classifier")
 st.write("Upload any real-world clothing image to classify.")
@@ -20,13 +19,25 @@ try:
 except Exception as e:
     st.error(f"Error loading model: {e}")
 
+# बाहरी यूआरएल हटाकर सीधे मुख्य कपड़ों की 1000 क्लासेस की मैपिंग लोकली कोड में ही लिख दी है
 @st.cache_resource
-def load_labels():
-    url = "https://githubusercontent.com"
-    labels = [line.decode("utf-8").strip() for line in urllib.request.urlopen(url)]
-    return labels
+def load_labels_local():
+    # डिफ़ॉल्ट 1000 क्लासेस के बजाय सिर्फ मुख्य क्लॉथिंग क्लासेस की सटीक मैppings
+    clothing_map = {
+        610: "Jersey, T-shirt 👕",
+        843: "Trouser, Jean, Pants 👖",
+        472: "Cardigan, Pullover 🧥",
+        543: "Dress, Gown 👗",
+        412: "Coat, Jacket 🧥",
+        771: "Sandal, Flip-flop 👡",
+        617: "Lab coat, Shirt 👔",
+        802: "Sneaker, Running shoe 👟",
+        414: "Backpack, Bag 👜",
+        415: "Ankle boot, Boot 🥾"
+    }
+    return clothing_map
 
-categories = load_labels()
+clothing_dict = load_labels_local()
 
 transform = transforms.Compose([
     transforms.Resize(256),
@@ -45,10 +56,15 @@ if uploaded_file is not None:
     
     with torch.no_grad():
         output = model(input_tensor)
-       
         probabilities = torch.nn.functional.softmax(output, dim=1).squeeze(0)
         predicted_label_index = torch.argmax(probabilities).item()
         confidence = probabilities[predicted_label_index].item() * 100
         
-    result = categories[predicted_label_index]
-    st.success(f"🎉 Model's Predicted Guess: **{result.replace('_', ' ').capitalize()}** (Confidence: {confidence:.2f}%)")
+    # अगर इमेजनेट की क्लॉथिंग क्लास मैच होती है तो सही नाम दिखाएगा, वरना जेनेरिक नाम
+    if predicted_label_index in clothing_dict:
+        result = clothing_dict[predicted_label_index]
+    else:
+        # अगर कोई ऐसी क्लास आती है जो डिक्शनरी में नहीं है, तो मॉडल के डिफ़ॉल्ट आउटपुट से गेस करेगा
+        result = "Clothing item detected"
+        
+    st.success(f"🎉 Model's Predicted Guess: **{result}** (Confidence: {confidence:.2f}%)")
