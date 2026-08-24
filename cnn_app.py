@@ -7,7 +7,6 @@ from PIL import Image
 st.title("Fashion CNN Classifier")
 st.write("Upload a clothing item image to classify.")
 
-
 class FashionCNN(nn.Module):
     def __init__(self):
         super(FashionCNN, self).__init__()
@@ -37,9 +36,10 @@ except Exception as e:
     st.error(f"Error loading model: {e}")
 
 clothing_categories = {
-    0: "T-shirt 👕", 1: "Trouser 👖", 2: "Pullover 🧥", 3: "Dress 👗", 4: "Coat 🧥",
+    0: "T-shirt 👕", 1: "Trouser 👖", 2: "Pullover 🧥", 3: "Dress 👗", 4: "Coat 👑",
     5: "Sandal 👡", 6: "Shirt 👔", 7: "Sneaker 👟", 8: "Bag 👜", 9: "Ankle boot 🥾"
 }
+
 
 transform = transforms.Compose([
     transforms.Grayscale(num_output_channels=1),
