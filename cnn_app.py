@@ -1,60 +1,54 @@
 import streamlit as st
 import torch
 import torch.nn as nn
+import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
-import numpy as np
-import sys
+import urllib.request
 
-st.title("Fashion CNN Classifier")
-
-class FashionCNN(nn.Module):
-    def __init__(self):
-        super(FashionCNN, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, padding=1)
-        self.relu = nn.ReLU()
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.fc = nn.Linear(16 * 14 * 14, 10)
-        
-    def forward(self, x):
-        x = self.conv1(x)
-        x = self.relu(x)
-        x = self.pool(x)
-        x = x.view(x.size(0), -1)
-        x = self.fc(x)
-        return x
-
-sys.modules['__main__'].FashionCNN = FashionCNN
+st.title("Industry Standard Clothing Classifier")
+st.write("Upload any real-world clothing image to classify.")
 
 @st.cache_resource
-def load_full_model():
-    return torch.load('full_fashion_model.pth', map_location=torch.device('cpu'), weights_only=False)
+def load_industry_model():
+    model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
+    model.eval()
+    return model
 
 try:
-    model = load_full_model()
-    model.eval()
+    model = load_industry_model()
 except Exception as e:
     st.error(f"Error loading model: {e}")
 
-clothing_categories = {
-    0: "T-shirt 👕", 1: "Trouser 👖", 2: "Pullover 🧥", 3: "Dress 👗", 4: "Coat 🧥",
-    5: "Sandal 👡", 6: "Shirt 👔", 7: "Sneaker 👟", 8: "Bag 👜", 9: "Ankle boot 🥾"
-}
+@st.cache_resource
+def load_labels():
+    url = "https://githubusercontent.com"
+    labels = [line.decode("utf-8").strip() for line in urllib.request.urlopen(url)]
+    return labels
+
+categories = load_labels()
+
+transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
 
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert('L').resize((28, 28))
-    st.image(image, caption='Processed Image', use_container_width=True)
+    image = Image.open(uploaded_file).convert('RGB')
+    st.image(image, caption='Uploaded Image', use_container_width=True)
     
-    # Mathematical Sync: Convert image into a standard 0.0 - 1.0 NumPy array first
-    img_array = np.array(image, dtype=np.float32) / 255.0
-    
-    # Cast directly to a clean PyTorch FloatTensor and add Batch/Channel dimensions
-    input_tensor = torch.from_numpy(img_array).unsqueeze(0).unsqueeze(0).float()
+    input_tensor = transform(image).unsqueeze(0)
     
     with torch.no_grad():
         output = model(input_tensor)
-        predicted_label_index = torch.argmax(output, dim=1).item()
+       
+        probabilities = torch.nn.functional.softmax(output, dim=1).squeeze(0)
+        predicted_label_index = torch.argmax(probabilities).item()
+        confidence = probabilities[predicted_label_index].item() * 100
         
-    st.success(f"🎉 Model's Predicted Guess: {clothing_categories[predicted_label_index]}")
+    result = categories[predicted_label_index]
+    st.success(f"🎉 Model's Predicted Guess: **{result.replace('_', ' ').capitalize()}** (Confidence: {confidence:.2f}%)")
