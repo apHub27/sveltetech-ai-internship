@@ -7,7 +7,7 @@ from PIL import Image
 st.title("Fashion CNN Classifier")
 st.write("Upload a clothing item image to classify.")
 
-# यह आपके कोलाब का ओरिजिनल आर्किटेक्चर है
+
 class FashionCNN(nn.Module):
     def __init__(self):
         super(FashionCNN, self).__init__()
