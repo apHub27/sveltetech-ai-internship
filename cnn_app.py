@@ -55,7 +55,9 @@ if uploaded_file is not None:
    
     img_array = np.array(image_gray, dtype=np.float32) / 255.0
     
-   
+    if img_array.mean() > 0.5:
+    img_array = 1.0 - img_array
+    
     input_tensor = torch.from_numpy(img_array).unsqueeze(0).unsqueeze(0).float()
     
     with torch.no_grad():
