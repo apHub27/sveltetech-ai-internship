@@ -23,7 +23,7 @@ class FashionCNN(nn.Module):
         x = self.fc(x)
         return x
 
-@st.cache_resource
+
 def load_model():
     model = FashionCNN()
     model.load_state_dict(torch.load('my_cnn_model.pth', map_location=torch.device('cpu')))
