@@ -1,9 +1,31 @@
 import streamlit as st
 import torch
+import torch.nn as nn
 import torchvision.transforms as transforms
 from PIL import Image
+import sys
 
 st.title("Fashion CNN Classifier")
+
+
+class FashionCNN(nn.Module):
+    def __init__(self):
+        super(FashionCNN, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, padding=1)
+        self.relu = nn.ReLU()
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.fc = nn.Linear(16 * 14 * 14, 10)
+        
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.relu(x)
+        x = self.pool(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x
+
+
+sys.modules['__main__'].FashionCNN = FashionCNN
 
 @st.cache_resource
 def load_full_model():
