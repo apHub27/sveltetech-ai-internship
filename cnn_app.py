@@ -1,21 +1,40 @@
 import streamlit as st
 import torch
 import torch.nn as nn
-import torchvision.models as models
-import torchvision.transforms as transforms
 from PIL import Image
+import numpy as np
+import sys
 
 st.title("Fashion CNN Classifier")
 st.write("Upload a clothing item image to classify.")
 
+
+class FashionCNN(nn.Module):
+    def __init__(self):
+        super(FashionCNN, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, padding=1)
+        self.relu = nn.ReLU()
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.fc = nn.Linear(16 * 14 * 14, 10)
+        
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.relu(x)
+        x = self.pool(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x
+
+sys.modules['__main__'].FashionCNN = FashionCNN
+
 @st.cache_resource
-def load_industry_model():
-    model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
-    model.eval()
-    return model
+def load_full_model():
+
+    return torch.load('full_fashion_model.pth', map_location=torch.device('cpu'), weights_only=False)
 
 try:
-    model = load_industry_model()
+    model = load_full_model()
+    model.eval()
 except Exception as e:
     st.error(f"Error loading model: {e}")
 
@@ -24,46 +43,23 @@ clothing_categories = {
     5: "Sandal 👡", 6: "Shirt 👔", 7: "Sneaker 👟", 8: "Bag 👜", 9: "Ankle boot 🥾"
 }
 
-
-imagenet_to_fashion = {
-    610: 0, # jersey -> T-shirt
-    843: 1, # jean -> Trouser
-    472: 2, # cardigan -> Pullover
-    543: 3, # gown -> Dress
-    412: 4, # trench coat -> Coat
-    771: 5, # sandal -> Sandal
-    617: 6, # lab coat -> Shirt
-    802: 7, # running shoe -> Sneaker
-    414: 8, # backpack -> Bag
-    415: 9  # ankle boot -> Ankle boot
-}
-
-transform = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
-
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert('RGB')
+    image = Image.open(uploaded_file)
     st.image(image, caption='Uploaded Image', use_container_width=True)
     
-    input_tensor = transform(image).unsqueeze(0)
+    
+    image_gray = image.convert('L').resize((28, 28))
+    
+   
+    img_array = np.array(image_gray, dtype=np.float32) / 255.0
+    
+   
+    input_tensor = torch.from_numpy(img_array).unsqueeze(0).unsqueeze(0).float()
     
     with torch.no_grad():
         output = model(input_tensor)
-        probabilities = torch.nn.functional.softmax(output, dim=1).squeeze(0)
+        predicted_label_index = torch.argmax(output, dim=1).item()
         
-       
-        best_fashion_idx = 0
-        max_prob = -1.0
-        
-        for imgnet_idx, fashion_idx in imagenet_to_fashion.items():
-            if probabilities[imgnet_idx].item() > max_prob:
-                max_prob = probabilities[imgnet_idx].item()
-                best_fashion_idx = fashion_idx
-                
-    st.success(f"🎉 Model's Predicted Guess: **{clothing_categories[best_fashion_idx]}**")
+    st.success(f"🎉 Model's Predicted Guess: **{clothing_categories[predicted_label_index]}**")
