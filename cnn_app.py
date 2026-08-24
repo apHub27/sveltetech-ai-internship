@@ -36,13 +36,11 @@ except Exception as e:
     st.error(f"Error loading model: {e}")
 
 clothing_categories = {
-    0: "T-shirt 👕", 1: "Trouser 👖", 2: "Pullover 🧥", 3: "Dress 👗", 4: "Coat 👑",
+    0: "T-shirt 👕", 1: "Trouser 👖", 2: "Pullover 🧥", 3: "Dress 👗", 4: "Coat 🧥",
     5: "Sandal 👡", 6: "Shirt 👔", 7: "Sneaker 👟", 8: "Bag 👜", 9: "Ankle boot 🥾"
 }
 
-
 transform = transforms.Compose([
-    transforms.Grayscale(num_output_channels=1),
     transforms.Resize((28, 28)),
     transforms.ToTensor()
 ])
@@ -53,10 +51,14 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption='Uploaded Image', use_container_width=True)
     
-    input_tensor = transform(image).unsqueeze(0)
+   
+    image_gray = image.convert('L')
+    
+   
+    input_tensor = transform(image_gray).unsqueeze(0).float()
     
     with torch.no_grad():
         output = model(input_tensor)
-        predicted_label_index = torch.argmax(output).item()
+        predicted_label_index = torch.argmax(output, dim=1).item()
         
     st.success(f"🎉 Model's Predicted Guess: {clothing_categories[predicted_label_index]}")
