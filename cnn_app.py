@@ -8,7 +8,6 @@ import sys
 st.title("Fashion CNN Classifier")
 st.write("Upload a clothing item image to classify.")
 
-
 class FashionCNN(nn.Module):
     def __init__(self):
         super(FashionCNN, self).__init__()
@@ -16,7 +15,7 @@ class FashionCNN(nn.Module):
         self.relu = nn.ReLU()
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
         self.fc = nn.Linear(16 * 14 * 14, 10)
-        
+
     def forward(self, x):
         x = self.conv1(x)
         x = self.relu(x)
@@ -29,7 +28,6 @@ sys.modules['__main__'].FashionCNN = FashionCNN
 
 @st.cache_resource
 def load_full_model():
-
     return torch.load('full_fashion_model.pth', map_location=torch.device('cpu'), weights_only=False)
 
 try:
@@ -48,20 +46,21 @@ uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption='Uploaded Image', use_container_width=True)
-    
-    
+
     image_gray = image.convert('L').resize((28, 28))
-    
-   
+
     img_array = np.array(image_gray, dtype=np.float32) / 255.0
-    
+
+    # FashionMNIST training images have a dark background with light clothing.
+    # Real uploaded photos usually have a light background - invert if needed
+    # so the input matches what the model was actually trained on.
     if img_array.mean() > 0.5:
-    img_array = 1.0 - img_array
-    
+        img_array = 1.0 - img_array
+
     input_tensor = torch.from_numpy(img_array).unsqueeze(0).unsqueeze(0).float()
-    
+
     with torch.no_grad():
         output = model(input_tensor)
         predicted_label_index = torch.argmax(output, dim=1).item()
-        
+
     st.success(f"🎉 Model's Predicted Guess: **{clothing_categories[predicted_label_index]}**")
