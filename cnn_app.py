@@ -4,10 +4,9 @@ import torch.nn as nn
 import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
-import json
 
-st.title("Industry Standard Clothing Classifier")
-st.write("Upload any real-world clothing image to classify.")
+st.title("Fashion CNN Classifier")
+st.write("Upload a clothing item image to classify.")
 
 @st.cache_resource
 def load_industry_model():
@@ -20,15 +19,24 @@ try:
 except Exception as e:
     st.error(f"Error loading model: {e}")
 
-# पूरी 1000 क्लासेस की मैपिंग लोकली बिना किसी इंटरनेट लिंक के फिक्स कर दी है
-@st.cache_resource
-def load_labels_local():
-    # क्लॉथिंग से जुड़े सभी 1000 इंडेक्स की मुख्य क्लासेस की मैपिंग
-    import torchvision.models as models
-    weights = models.MobileNet_V3_Small_Weights.DEFAULT
-    return weights.meta["categories"]
+clothing_categories = {
+    0: "T-shirt 👕", 1: "Trouser 👖", 2: "Pullover 🧥", 3: "Dress 👗", 4: "Coat 🧥",
+    5: "Sandal 👡", 6: "Shirt 👔", 7: "Sneaker 👟", 8: "Bag 👜", 9: "Ankle boot 🥾"
+}
 
-categories = load_labels_local()
+
+imagenet_to_fashion = {
+    610: 0, # jersey -> T-shirt
+    843: 1, # jean -> Trouser
+    472: 2, # cardigan -> Pullover
+    543: 3, # gown -> Dress
+    412: 4, # trench coat -> Coat
+    771: 5, # sandal -> Sandal
+    617: 6, # lab coat -> Shirt
+    802: 7, # running shoe -> Sneaker
+    414: 8, # backpack -> Bag
+    415: 9  # ankle boot -> Ankle boot
+}
 
 transform = transforms.Compose([
     transforms.Resize(256),
@@ -48,8 +56,14 @@ if uploaded_file is not None:
     with torch.no_grad():
         output = model(input_tensor)
         probabilities = torch.nn.functional.softmax(output, dim=1).squeeze(0)
-        predicted_label_index = torch.argmax(probabilities).item()
-        confidence = probabilities[predicted_label_index].item() * 100
         
-    result = categories[predicted_label_index]
-    st.success(f"🎉 Model's Predicted Guess: **{result.replace('_', ' ').capitalize()}** (Confidence: {confidence:.2f}%)")
+       
+        best_fashion_idx = 0
+        max_prob = -1.0
+        
+        for imgnet_idx, fashion_idx in imagenet_to_fashion.items():
+            if probabilities[imgnet_idx].item() > max_prob:
+                max_prob = probabilities[imgnet_idx].item()
+                best_fashion_idx = fashion_idx
+                
+    st.success(f"🎉 Model's Predicted Guess: **{clothing_categories[best_fashion_idx]}**")
