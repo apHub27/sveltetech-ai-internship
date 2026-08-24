@@ -7,7 +7,7 @@ st.title("Fashion CNN Classifier")
 
 @st.cache_resource
 def load_full_model():
-    return torch.load('full_fashion_model.pth', map_location=torch.device('cpu'))
+    return torch.load('full_fashion_model.pth', map_location=torch.device('cpu'), weights_only=False)
 
 try:
     model = load_full_model()
@@ -16,7 +16,7 @@ except Exception as e:
     st.error(f"Error: {e}")
 
 clothing_categories = {
-    0: "T-shirt 👕", 1: "Trouser 👖", 2: "Pullover 🧥", 3: "Dress 👑", 4: "Coat 🧥",
+    0: "T-shirt 👕", 1: "Trouser 👖", 2: "Pullover 🧥", 3: "Dress 👗", 4: "Coat 🧥",
     5: "Sandal 👡", 6: "Shirt 👔", 7: "Sneaker 👟", 8: "Bag 👜", 9: "Ankle boot 🥾"
 }
 
