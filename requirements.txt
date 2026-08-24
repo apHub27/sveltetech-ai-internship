@@ -1,2 +1,6 @@
 numpy
 scikit-learn
+streamlit
+torch
+torchvision
+pillow
