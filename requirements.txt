@@ -4,3 +4,6 @@ streamlit
 torch
 torchvision
 pillow
+pandas
+yfinance
+matplotlib
