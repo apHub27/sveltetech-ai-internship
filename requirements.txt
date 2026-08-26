@@ -2,9 +2,7 @@ numpy
 scikit-learn
 streamlit
 torch
-torchvision
 pillow
 pandas
 yfinance
 matplotlib
- 
