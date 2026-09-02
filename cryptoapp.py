@@ -51,9 +51,14 @@ sys.modules["__main__"].SimpleGRU = SimpleGRU
 # --- Load models and scaler ---
 @st.cache_resource
 def load_everything():
-    rnn = torch.load("rnn_model.pth", map_location="cpu", weights_only=False)
-    lstm = torch.load("lstm_model.pth", map_location="cpu", weights_only=False)
-    gru = torch.load("gru_model.pth", map_location="cpu", weights_only=False)
+   rnn = SimpleRNN()
+    rnn.load_state_dict(torch.load("rnn_model.pth", map_location="cpu"))
+    
+    lstm = SimpleLSTM()
+    lstm.load_state_dict(torch.load("lstm_model.pth", map_location="cpu"))
+    
+    gru = SimpleGRU()
+    gru.load_state_dict(torch.load("gru_model.pth", map_location="cpu"))
     with open("scaler.pkl", "rb") as f:
         scaler = pickle.load(f)
     rnn.eval(); lstm.eval(); gru.eval()
