@@ -51,7 +51,7 @@ sys.modules["__main__"].SimpleGRU = SimpleGRU
 # --- Load models and scaler ---
 @st.cache_resource
 def load_everything():
-   rnn = SimpleRNN()
+    rnn = SimpleRNN()
     rnn.load_state_dict(torch.load("rnn_model.pth", map_location="cpu"))
     
     lstm = SimpleLSTM()
