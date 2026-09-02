@@ -44,6 +44,7 @@ Target: Next-day closing price, predicted from the previous 60 days
 
 
 ⚙️ How It Works — Pipeline Overview
+
 Raw price data (yfinance)
    → Scale prices to 0–1 range (MinMaxScaler)
    → Build 60-day sequences (past 60 days → predict day 61)
@@ -67,12 +68,6 @@ GRU — a simplified LSTM variant with fewer gates (Reset/Update), often faster 
 
 An initial comparison at 50 epochs made GRU look far worse (47% error) than LSTM (11% error). Investigating further revealed GRU's training loss was still dropping rapidly — it simply hadn't finished converging yet. All three models were retrained for 100 epochs to ensure a fair comparison.
 
-Once properly trained:
-
-Model	MAE	% Error
-GRU	$2,136.56	3.4% (best)
-LSTM	$3,256.08	5.2%
-RNN	$3,313.48	5.3%
 
 Lesson: an apparent "winner" after limited training can be misleading — training time must be controlled for before drawing architectural conclusions.
 
@@ -83,6 +78,7 @@ All three models show noticeable prediction lag during sharp, sudden price movem
 5. Deployment
 Trained models saved via torch.save() and loaded in a Streamlit app using state_dict loading (loading weights into a freshly instantiated model class, rather than pickling the full model object)
 The app fetches live recent Bitcoin data via yfinance, lets the user choose a model (or compare all three), and displays the predicted next-day price alongside a chart
+
 🛠️ Tech Stack
 Language: Python
 Deep Learning: PyTorch (nn.RNN, nn.LSTM, nn.GRU)
@@ -91,6 +87,7 @@ Preprocessing: scikit-learn (MinMaxScaler)
 UI: Streamlit
 Deployment: Streamlit Community Cloud
 Visualization: Matplotlib
+
 📁 Project Files
 cryptoapp.py          - Streamlit web app
 rnn_model.pth          - Trained RNN weights (state_dict)
@@ -106,9 +103,6 @@ README.md
 Model files were initially saved and loaded as full pickled objects (torch.save(model, ...)), but ended up containing only the model's weights (state_dict) rather than the complete model object — causing a load failure ('OrderedDict' object has no attribute 'eval') on deployment. Fixed by instantiating the model architecture first, then loading the saved weights into it via load_state_dict() — a more robust pattern than pickling full model objects.
 
 
-
-👤 Author
-Ankit — AI Intern, SvelteTech
 
 👤 Author
 Ankit — AI Intern, SvelteTech
