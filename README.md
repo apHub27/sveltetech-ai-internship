@@ -28,7 +28,8 @@ deployed: https://8501-m-s-kkb-use1c1-18megw66scakm-c.us-east1-1.prod.colab.dev/
 Bitcoin Price Prediction — RNN vs LSTM vs GRU
 
 A time-series deep learning project that predicts next-day Bitcoin price using three different recurrent neural network architectures — RNN, LSTM, and GRU — and compares their performance fairly.
-🔗 Live App: [https://sveltetech-ai-internship-qbbrjnia2f4z6yshgz8avv.streamlit.app/]
+
+ Live App: [https://sveltetech-ai-internship-qbbrjnia2f4z6yshgz8avv.streamlit.app/]
 
 📌 Project Overview
 
@@ -69,7 +70,6 @@ GRU — a simplified LSTM variant with fewer gates (Reset/Update), often faster 
 An initial comparison at 50 epochs made GRU look far worse (47% error) than LSTM (11% error). Investigating further revealed GRU's training loss was still dropping rapidly — it simply hadn't finished converging yet. All three models were retrained for 100 epochs to ensure a fair comparison.
 
 Once properly trained:
-
 Model	MAE	% Error
 GRU	$2,136.56	3.4% (best)
 LSTM	$3,256.08	5.2%
@@ -84,7 +84,9 @@ All three models show noticeable prediction lag during sharp, sudden price movem
 5. Deployment
 Trained models saved via torch.save() and loaded in a Streamlit app using state_dict loading (loading weights into a freshly instantiated model class, rather than pickling the full model object)
 The app fetches live recent Bitcoin data via yfinance, lets the user choose a model (or compare all three), and displays the predicted next-day price alongside a chart
+
 🛠️ Tech Stack
+
 Language: Python
 Deep Learning: PyTorch (nn.RNN, nn.LSTM, nn.GRU)
 Data: yfinance, pandas, numpy
@@ -92,7 +94,9 @@ Preprocessing: scikit-learn (MinMaxScaler)
 UI: Streamlit
 Deployment: Streamlit Community Cloud
 Visualization: Matplotlib
+
 📁 Project Files
+
 ├── cryptoapp.py          # Streamlit web app
 ├── rnn_model.pth          # Trained RNN weights (state_dict)
 ├── lstm_model.pth         # Trained LSTM weights (state_dict)
