@@ -1,4 +1,3 @@
-app_code = '''
 import streamlit as st
 import torch
 import torch.nn as nn
@@ -9,8 +8,8 @@ import pickle
 import matplotlib.pyplot as plt
 import sys
 
-st.set_page_config(page_title="Bitcoin Price Predictor", page_icon="\\U0001F52E")
-st.title("\\U0001F52E Bitcoin Price Predictor (RNN vs LSTM vs GRU)")
+st.set_page_config(page_title="Bitcoin Price Predictor")
+st.title(" Bitcoin Price Predictor (RNN vs LSTM vs GRU)")
 st.write("Predicts next-day Bitcoin price using the last 60 days of data.")
 st.write("---")
 
@@ -113,9 +112,3 @@ if st.button("Predict Next Day Price"):
             model_map = {"RNN": rnn_model, "LSTM": lstm_model, "GRU": gru_model}
             pred = predict(model_map[model_choice])
             st.success(f"### {model_choice} Predicted Next-Day Price: ${pred:,.2f}")
-'''
-
-with open('app.py', 'w') as f:
-    f.write(app_code)
-
-print("app.py written successfully")
